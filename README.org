@@ -4,9 +4,9 @@
 
 * About
 
-Conway's Game of Life implementaion on shellscript.
+Conway's Game of Life implementation on shell script.
 
-* usage
+* Usage
 
 one step execution.
 
@@ -24,7 +24,7 @@ bin/conwaygol
 * File tree
 
 + ConwayGoL
-  + .git            : git repogitory
+  + .git            : git repository
   - .gitignore      : git ignoring file definition
   - README.org      : This README file
   - LICENSE         : About License
