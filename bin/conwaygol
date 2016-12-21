@@ -1,0 +1,98 @@
+#!/bin/sh
+
+LANG=C
+
+pname=$(basename $0)
+stime=$(date +%Y%m%d%H%M%S)
+tmp=/tmp/"$pname"."$stime"
+
+trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+init=${1:-"-"}
+
+X=${2:-"10"}
+Y=${3:-"10"}
+
+######################################################################
+
+cat "$init"	|
+    # split 1 cell into 1 field with i=0 and i=X+1 field
+    awk -v FS='' -v X="$X" -v Y="$Y"	'
+	BEGIN{	L = "0 "
+		for(i=0;i<X;i++)	{	L = L "0 "	}
+		L = L "0"
+		print L	}
+	NR > Y	{
+		print "'"$pname.$stime.$$[$LINENO]INFO : cell row overflow, choped."'"	> "/dev/stderr";
+		exit 0;
+	}
+	{
+		printf "0 ";
+		for(i=1;i<=X;i++)	{
+			if($(i) == " " || $(i) == "_" || $(i) == "" )	{
+				printf "0 ";
+			} else	{
+				printf "1 ";
+			}
+		}
+		print "0";
+
+		if($(X+1) != "")	{
+			print "'"$pname.$stime.$$[$LINENO]INFO : cell colmun overflow, choped."'"	> "/dev/stderr";
+		}
+	}
+	END{	print L;	}'					|
+    # overwrap 3 lines
+    awk '
+	(NR % 3) == 1	{	l1 = $0	}
+	(NR % 3) == 2	{	l2 = $0	}
+	(NR % 3) == 0	{	l0 = $0	}
+
+	(NR % 3) == 0 && NR >=3	{	print l1, l2, l0 	}
+	(NR % 3) == 1 && NR >=3	{	print l2, l0, l1	}
+	(NR % 3) == 2 && NR >=3	{	print l0, l1, l2	}'	|
+    # bind 9 cells into 1 cell
+    awk -v X="$X" -v Y="$Y"	'
+	BEGIN{	o = X + 2; }
+	{	for(i=1;i<=X;i++)	{
+			l = ""					# clear
+			l = l $(i)     $(i+1)     $(i+2)	# upper cell
+			l = l $(o+i)   $(o+i+1)   $(o+i+2)	# middle cell
+			l = l $(2*o+i) $(2*o+i+1) $(2*o+i+2)	# lower cell
+
+			print l
+		}
+	}'									|
+    # # the output is one cell per one line
+    #
+    # apply rules
+    awk -v FS="" -v X="$X" -v Y="$Y"	'
+	{	n = 0;
+		for(i=1;i<=9;i++)	{	n += $(i)	}
+
+		if($5 == 0)	{	# dead cell
+			# RULE1 : reproduction
+			if(n == 3)				{	print "X";	}
+			else					{	print "_";	}
+		} else {	# living cell
+			# RULE2 : sustain
+			if(n == (2 + 1) || n == (3 + 1))	{	print "X";	}
+			# RULE3 : underpopulation
+			else if (n <= (1 + 1))			{	print "_";	}
+			# RULE4 : overpopulation
+			else if (n >= (4 + 1))			{	print "_";	}
+			# unreachable
+			else	{
+				print "'"$pname.$stime.$$[$LINENO]ERROR : unreachable code section."'"	> "/dev/stderr";
+				exit 1;
+			}
+		}
+	}'									|
+    tr -d '\n'									|
+    fold -w $X									|
+    awk '1'
+
+######################################################################
+exit 0
