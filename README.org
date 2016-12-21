@@ -1,0 +1,44 @@
+* COMMENT -*- Mode: org; -*-
+
+#+TITLE: ConwayGOL
+
+* About
+
+Conway's Game of Life implementaion on shellscript.
+
+* usage
+
+one step execution.
+
+#+BEGIN_SRC 
+bin/conwaygol example-pattern/glider 
+#+END_SRC
+
+2 step execution.
+
+#+BEGIN_SRC 
+bin/conwaygol example-pattern/glider	|
+bin/conwaygol
+#+END_SRC
+
+* File tree
+
++ ConwayGoL
+  + .git            : git repogitory
+  - .gitignore      : git ignoring file definition
+  - README.org      : This README file
+  - LICENSE         : About License
+
+  + bin             : Scripts directory
+    - conwaygol     : Conway's game of life implementation
+
+  + example-pattern : Example patterns directory
+    - glider        : Glider pattern
+
+* References
+
+https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+
+https://ja.wikipedia.org/wiki/%E3%83%A9%E3%82%A4%E3%83%95%E3%82%B2%E3%83%BC%E3%83%A0
+
+http://math.shinshu-u.ac.jp/~hanaki/lifegame/
