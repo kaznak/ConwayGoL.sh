@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 LANG=C
 
-pname=$(basename $0)
+pname="$(basename "$0")"
 stime=$(date +%Y%m%d%H%M%S)
 tmp=/tmp/"$pname"."$stime"
 
@@ -10,16 +10,15 @@ trap 'rm -f $tmp-*' EXIT
 
 ######################################################################
 
-init=${1:-"-"}
+pattern=${1:-"-"}
 
 X=${2:-"10"}
 Y=${3:-"10"}
 
 ######################################################################
 
-cat "$init"	|
-    # split 1 cell into 1 field with i=0 and i=X+1 field
-    awk -v FS='' -v X="$X" -v Y="$Y"	'
+# split 1 cell into 1 field with i=0 and i=X+1 field
+awk -v FS='' -v X="$X" -v Y="$Y"	'
 	BEGIN{	L = "0 "
 		for(i=0;i<X;i++)	{	L = L "0 "	}
 		L = L "0"
@@ -43,7 +42,7 @@ cat "$init"	|
 			print "'"$pname.$stime.$$[$LINENO]INFO : cell colmun overflow, choped."'"	> "/dev/stderr";
 		}
 	}
-	END{	print L;	}'					|
+	END{	print L;	}' "$pattern"					|
     # overwrap 3 lines
     awk '
 	(NR % 3) == 1	{	l1 = $0	}
@@ -91,7 +90,7 @@ cat "$init"	|
 		}
 	}'									|
     tr -d '\n'									|
-    fold -w $X									|
+    fold -w "$X"								|
     awk '1'
 
 ######################################################################
