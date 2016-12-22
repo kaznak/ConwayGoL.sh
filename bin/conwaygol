@@ -17,43 +17,53 @@ Y=${3:-"10"}
 
 ######################################################################
 
-# split 1 cell into 1 field with i=0 and i=X+1 field
+mkfifo $tmp-base
+
+tr '\0' '0'	< /dev/zero	|
+    fold -w $((X + 2))		|
+    head -n $((Y + 2))	> $tmp-base	&
+
+# shape X x Y size
+## == narrow $X $Y 0 0
 awk -v FS='' -v X="$X" -v Y="$Y"	'
-	BEGIN{	L = "0 "
-		for(i=0;i<X;i++)	{	L = L "0 "	}
-		L = L "0"
-		print L	}
 	NR > Y	{
 		print "'"$pname.$stime.$$[$LINENO]INFO : cell row overflow, choped."'"	> "/dev/stderr";
 		exit 0;
 	}
-	{
-		printf "0 ";
-		for(i=1;i<=X;i++)	{
-			if($(i) == " " || $(i) == "_" || $(i) == "" )	{
-				printf "0 ";
-			} else	{
-				printf "1 ";
-			}
-		}
-		print "0";
-
-		if($(X+1) != "")	{
-			print "'"$pname.$stime.$$[$LINENO]INFO : cell colmun overflow, choped."'"	> "/dev/stderr";
-		}
+	(length() > X)	{
+		print "'"$pname.$stime.$$[$LINENO]INFO : cell colmun overflow, choped."'"	> "/dev/stderr";
 	}
-	END{	print L;	}' "$pattern"					|
-    # overwrap 3 lines
-    awk '
-	(NR % 3) == 1	{	l1 = $0	}
-	(NR % 3) == 2	{	l2 = $0	}
-	(NR % 3) == 0	{	l0 = $0	}
-
-	(NR % 3) == 0 && NR >=3	{	print l1, l2, l0 	}
-	(NR % 3) == 1 && NR >=3	{	print l2, l0, l1	}
-	(NR % 3) == 2 && NR >=3	{	print l0, l1, l2	}'	|
+	{	print substr($0,1,'"$X"')	}'	$pattern	|
+    # == ido 1 1
+    awk -v FS='' -v X="$X" -v Y="$Y"	'
+	BEGIN{	print	}
+	{	print " " $0 }'						|
+    # translate
+    tr '0 _' 0		|
+    tr -c '0 _\n' 1	|
+    # == overlay $tmp-base -
+    paste -d'\0' $tmp-base -						|
+    awk -v FS='' -v X="$X" -v Y="$Y"	'
+	BEGIN{	o = X + 2; }
+	((l = length()) == X)	{
+		print ; next ;	}
+	{	print substr($0,o+1,l-o) substr($0,l-o+1,2 * o-l)
+		next ;	}'						|
+    #
+    # {{ foldcell
+    # == overwrap 3
+    awk -v W=3	'
+	{	i = (NR % W) ; l[i] = $0 ;	}
+	NR >= W{
+		o = l[(i+1) % W]
+		for(j=1;j<W;j++)	{
+			o = o " " l[(i+j+1) % W]
+		}
+		print o
+	}'								|
     # bind 9 cells into 1 cell
-    awk -v X="$X" -v Y="$Y"	'
+    tr -d ' '								|
+    awk -v FS="" -v X="$X" -v Y="$Y"	'
 	BEGIN{	o = X + 2; }
 	{	for(i=1;i<=X;i++)	{
 			l = ""					# clear
@@ -64,6 +74,7 @@ awk -v FS='' -v X="$X" -v Y="$Y"	'
 			print l
 		}
 	}'									|
+    # foldcell }}
     # # the output is one cell per one line
     #
     # apply rules
