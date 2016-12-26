@@ -28,6 +28,7 @@ bin/conwaygol
   - .gitignore      : git ignoring file definition
   - README.org      : This README file
   - LICENSE         : About License
+  - rc              : Set Environment paramters while development
 
   + bin             : Scripts directory
     - conwaygol     : Conway's game of life implementation

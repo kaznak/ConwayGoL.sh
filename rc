@@ -1,0 +1,2 @@
+
+PATH=$PWD/bin:$PWD/lib:$PATH
