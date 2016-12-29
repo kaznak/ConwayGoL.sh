@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
 LANG=C
 
 pname="$(basename "$0")"
-stime=$(date +%Y%m%d%H%M%S)
-tmp=/tmp/"$pname"."$stime".$$
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
 
 trap 'rm -f $tmp-*' EXIT
 
@@ -17,23 +17,23 @@ Y=${3:-"10"}
 
 ######################################################################
 
-mkfifo $tmp-base
+mkfifo "$tmp-base"
 
 tr '\0' '0'	< /dev/zero	|
     fold -w $((X + 2))		|
-    head -n $((Y + 2))	> $tmp-base	&
+    head -n $((Y + 2))	> "$tmp-base"	&
 
 # shape X x Y size
 ## == narrow $X $Y 0 0
 awk -v FS='' -v X="$X" -v Y="$Y"	'
 	NR > Y	{
-		print "'"$pname.$stime.$$[$LINENO]INFO : cell row overflow, choped."'"	> "/dev/stderr";
+		print "'"$pname.$stime.$$ INFO cell row overflow, choped."'"	> "/dev/stderr";
 		exit 0;
 	}
 	(length() > X)	{
-		print "'"$pname.$stime.$$[$LINENO]INFO : cell colmun overflow, choped."'"	> "/dev/stderr";
+		print "'"$pname.$stime.$$ INFO cell colmun overflow, choped."'"	> "/dev/stderr";
 	}
-	{	print substr($0,1,'"$X"')	}'	$pattern	|
+	{	print substr($0,1,'"$X"')	}'	"$pattern"	|
     # == ido 1 1
     awk -v FS='' -v X="$X" -v Y="$Y"	'
 	BEGIN{	print	}
@@ -41,8 +41,8 @@ awk -v FS='' -v X="$X" -v Y="$Y"	'
     # translate
     tr '0 _' 0		|
     tr -c '0 _\n' 1	|
-    # == overlay $tmp-base -
-    paste -d'\0' $tmp-base -						|
+    # == overlay "$tmp-base" -
+    paste -d'\0' "$tmp-base" -						|
     awk -v FS='' -v X="$X" -v Y="$Y"	'
 	BEGIN{	o = X + 2; }
 	((l = length()) == X)	{
@@ -95,7 +95,7 @@ awk -v FS='' -v X="$X" -v Y="$Y"	'
 			else if (n >= (4 + 1))			{	print "_";	}
 			# unreachable
 			else	{
-				print "'"$pname.$stime.$$[$LINENO]ERROR : unreachable code section."'"	> "/dev/stderr";
+				print "'"$pname.$stime.$$ ERROR unreachable code section."'"	> "/dev/stderr";
 				exit 1;
 			}
 		}
