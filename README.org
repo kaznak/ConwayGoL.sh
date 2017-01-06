@@ -33,6 +33,9 @@ bin/conwaygol
   + bin             : Scripts directory
     - conwaygol     : Conway's game of life implementation
 
+  + util            : Utility directory
+    - initpattern   : Allocate pattern onto specified canvas
+
   + example-pattern : Example patterns directory
     - glider        : Glider pattern
 
