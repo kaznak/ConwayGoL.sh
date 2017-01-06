@@ -8,17 +8,30 @@ Conway's Game of Life implementation on shell script.
 
 * Usage
 
-one step execution.
+Initialize.
 
 #+BEGIN_SRC 
-bin/conwaygol example-pattern/glider 
+. rc
+#+END_SRC
+
+One step execution.
+
+#+BEGIN_SRC 
+conwaygol example-pattern/glider 
 #+END_SRC
 
 2 step execution.
 
 #+BEGIN_SRC 
-bin/conwaygol example-pattern/glider	|
-bin/conwaygol
+conwaygol example-pattern/glider	|
+conwaygol
+#+END_SRC
+
+Play infinite step on your entire terminal.
+This will stop with no change between each step.
+
+#+BEGIN_SRC 
+play bin/conwaygol example-pattern/glider
 #+END_SRC
 
 * File tree
@@ -35,6 +48,7 @@ bin/conwaygol
 
   + util            : Utility directory
     - initpattern   : Allocate pattern onto specified canvas
+    - play          : Play game of life script
 
   + example-pattern : Example patterns directory
     - glider        : Glider pattern

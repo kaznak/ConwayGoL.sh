@@ -1,0 +1,64 @@
+#!/bin/sh
+
+LANG=C
+
+pname="$(basename "$0")"
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
+
+# trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+golscript=${1}
+pattern=${2:-"-"}
+X=${3:-"$(($(tput cols) - 1))"}
+Y=${4:-"$(($(tput lines) - 1))"}
+n=${5}
+
+######################################################################
+
+mkfifo "$tmp-f0.fifo" "$tmp-f1.fifo"
+
+refresh()	{
+    frame0=${1}
+   
+    awk -v FS=""	'
+    { for(i=1;i<=NF;i++) print NR, i, $(i)	}' "$frame0"	> "$tmp-f0.fifo"	&
+    awk -v FS=""	'
+    { for(i=1;i<=NF;i++) print NR, i, $(i)	}' 		> "$tmp-f1.fifo"	&
+
+    diff "$tmp-f0.fifo" "$tmp-f1.fifo"			|
+	grep '^>'					|
+	awk '
+	$4=="_"{ printf("\033[%s;%sH ", $2, $3) ; next; }
+	$4!="_"{ printf("\033[%s;%sH%s",$2, $3, $4) ; next; }'
+}
+
+printf "\033[0;0H\033[2J"
+initpattern "$pattern" "$X" "$Y" 0 0	|
+    tee "$tmp-current"			|
+    tr '_' ' '
+printf "\033[${Y};${X}H"
+
+yes			|
+    if [ "$n" ] ; then
+	head -n "$n"
+    else
+	cat
+    fi			|
+while read ; do
+    "$golscript" "$tmp-current" "$X" "$Y"	|
+	tee "$tmp-mid"				|
+	refresh "$tmp-current"			|
+	tee "$tmp-out"
+    printf "\033[${Y};${X}H"
+
+    mv "$tmp-mid" "$tmp-current"
+
+    if [ ! -s "$tmp-out" ] ; then break ; fi
+done
+
+echo
+
+exit 0
