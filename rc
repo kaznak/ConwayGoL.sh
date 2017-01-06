@@ -1,2 +1,2 @@
 
-PATH=$PWD/bin:$PWD/lib:$PATH
+PATH=$PWD/bin:$PWD/util:$PATH
