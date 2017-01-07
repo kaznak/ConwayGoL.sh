@@ -12,17 +12,11 @@ trap 'rm -f $tmp-*' EXIT
 
 golscript=${1}
 pattern=${2:-"-"}
-X=${3:-"$(($(tput cols) - 0))"}
-Y=${4:-"$(($(tput lines) - 0))"}
+X=${3:-"$(tput cols)"}
+Y=${4:-"$(tput lines)"}
 n=${5}
 
 ######################################################################
-
-# printf "\033[1;1H\033[2JX"
-# printf "\033[%d;%dHX" $((Y - 0)) $((X - 0))
-# read
-
-# exit 0
 
 mkfifo "$tmp-f0.fifo" "$tmp-f1.fifo"
 
