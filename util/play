@@ -18,33 +18,14 @@ n=${5}
 
 ######################################################################
 
-mkfifo "$tmp-f0.fifo" "$tmp-f1.fifo"
-
-refresh()	{
-    frame0=${1}
-
-    tr '_' ' '	< "$frame0"	|
-	awk -v FS=""	'
-	{	for(i=1;i<=NF;i++)
-			printf("\033[%s;%sH%s\n", NR, i, $(i))
-	}'	> "$tmp-f0.fifo"	&
-
-    tr '_' ' '			|
-	awk -v FS=""	'
-	{	for(i=1;i<=NF;i++)
-			printf("\033[%s;%sH%s\n", NR, i, $(i))
-	}'	> "$tmp-f1.fifo"	&
-
-    diff "$tmp-f0.fifo" "$tmp-f1.fifo"	|
-	grep '^>'			|
-	sed -e 's/^> //'		|
-	tr -d '\n'
-}
-
 initpattern "$pattern" "$X" "$Y" 0 0	|
     tee "$tmp-current"			|
-    tr '_' ' '				|
-    awk '{	printf("\033[%d;1H%s", NR, $0)	}'
+    awk -v FS=""	'
+	{	for(i=1;i<=NF;i++)
+			printf("\033[%s;%sH%s\n", NR, i, $(i))
+	}'	> "$tmp-current.x"
+
+awk '{	printf("\033[%d;1H%s", NR, $0)	}' "$tmp-current"
 
 yes			|
     if [ "$n" ] ; then
@@ -55,17 +36,24 @@ yes			|
 while read ; do
     printf "\033[1;1H\n"
     "$golscript" "$tmp-current" "$X" "$Y"	|
-	tee "$tmp-mid"				|
-	refresh "$tmp-current"			|
+	tee "$tmp-next"				|
+	awk -v FS=""	'
+	{	for(i=1;i<=NF;i++)
+			printf("\033[%s;%sH%s\n", NR, i, $(i))
+	}'					|
+	tee "$tmp-next.x"			|
+	diff "$tmp-current.x" -			|
+	grep '^>'				|
+	sed -e 's/^> //'			|
+	tr -d '\n'				|
 	tee "$tmp-out"
 
-    mv "$tmp-mid" "$tmp-current"
+    [ -s "$tmp-out" ]	||	break
 
-    if [ ! -s "$tmp-out" ] ; then
-	break
-    fi
+    mv "$tmp-next" "$tmp-current"
+    mv "$tmp-next.x" "$tmp-current.x"
 done
 
-printf "\033[1;1H"
+printf "\033[1;1H\033[2J"
 
 exit 0
