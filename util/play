@@ -12,9 +12,10 @@ trap 'rm -f $tmp-*' EXIT
 
 golscript=${1}
 pattern=${2:-"-"}
-X=${3:-"$(tput cols)"}
-Y=${4:-"$(tput lines)"}
-n=${5}
+step=${3}
+sleep=${4:-"0"}
+X=${5:-"$(tput cols)"}
+Y=${6:-"$(tput lines)"}
 
 ######################################################################
 
@@ -29,13 +30,15 @@ initpattern "$pattern" "$X" "$Y" 0 0	|
 awk '{	printf("\033[%d;1H%s", NR, $0)	}' "$tmp-current"
 
 yes			|
-    if [ "$n" ] ; then
-	head -n "$n"
+    if [ "$step" ] ; then
+	head -n "$step"
     else
 	cat
     fi			|
 while read ; do
     printf "\033[1;1H\n"
+    sleep "$sleep"
+
     "$golscript" "$tmp-current" "$X" "$Y"	|
 	tee "$tmp-next"				|
 	awk -v FS=""	'
