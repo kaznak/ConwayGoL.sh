@@ -39,7 +39,7 @@ Play infinite step on your entire terminal.
 This will stop with no change between each step.
 
 #+BEGIN_SRC 
-play bin/conwaygol example-pattern/glider
+playgol bin/conwaygol example-pattern/glider
 #+END_SRC
 
 * File tree
@@ -56,7 +56,7 @@ play bin/conwaygol example-pattern/glider
 
   + util            : Utility directory
     - initpattern   : Allocate pattern onto specified canvas
-    - play          : Play game of life script
+    - playgol       : Play game of life script
 
   + example-pattern : Example patterns directory
     - block         : Still lifes - Block pattern
