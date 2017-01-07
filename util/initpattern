@@ -43,8 +43,8 @@ awk -v FS='' -v X="$X" -v Y="$Y" -v dX="$dX" -v dY="$dY"	'
 		for(i=0;i<dX;i++) h = h " "	}
 	{	print h $0 }'						|
     # translate
-    tr ' _' '_'		|
-    tr -c ' _\n' 'X'	|
+    tr ' ' '_'		|
+    tr -c '_\n' 'X'	|
     # == overlay "$tmp-base" -
     paste -d'\0' "$tmp-base" -						|
     awk -v FS='' -v X="$X" -v Y="$Y" -v dX="$dX" -v dY="$dY"	'
