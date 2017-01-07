@@ -45,7 +45,7 @@ playgol bin/conwaygol example-pattern/glider
 * File tree
 
 + ConwayGoL
-  + .git            : git repository
+  + .git            : git system directory
   - .gitignore      : git ignoring file definition
   - README.org      : This README file
   - LICENSE         : About License
