@@ -6,40 +6,51 @@ pname="$(basename "$0")"
 stime="$(date +%Y%m%d%H%M%S)"
 tmp="/tmp/$pname.$stime.$$"
 
-# trap 'rm -f $tmp-*' EXIT
+trap 'rm -f $tmp-*' EXIT
 
 ######################################################################
 
 golscript=${1}
 pattern=${2:-"-"}
-X=${3:-"$(($(tput cols) - 1))"}
-Y=${4:-"$(($(tput lines) - 1))"}
+X=${3:-"$(($(tput cols) - 0))"}
+Y=${4:-"$(($(tput lines) - 0))"}
 n=${5}
 
 ######################################################################
+
+# printf "\033[1;1H\033[2JX"
+# printf "\033[%d;%dHX" $((Y - 0)) $((X - 0))
+# read
+
+# exit 0
 
 mkfifo "$tmp-f0.fifo" "$tmp-f1.fifo"
 
 refresh()	{
     frame0=${1}
-   
-    awk -v FS=""	'
-    { for(i=1;i<=NF;i++) print NR, i, $(i)	}' "$frame0"	> "$tmp-f0.fifo"	&
-    awk -v FS=""	'
-    { for(i=1;i<=NF;i++) print NR, i, $(i)	}' 		> "$tmp-f1.fifo"	&
 
-    diff "$tmp-f0.fifo" "$tmp-f1.fifo"			|
-	grep '^>'					|
-	awk '
-	$4=="_"{ printf("\033[%s;%sH ", $2, $3) ; next; }
-	$4!="_"{ printf("\033[%s;%sH%s",$2, $3, $4) ; next; }'
+    tr '_' ' '	< "$frame0"	|
+	awk -v FS=""	'
+	{	for(i=1;i<=NF;i++)
+			printf("\033[%s;%sH%s\n", NR, i, $(i))
+	}'	> "$tmp-f0.fifo"	&
+
+    tr '_' ' '			|
+	awk -v FS=""	'
+	{	for(i=1;i<=NF;i++)
+			printf("\033[%s;%sH%s\n", NR, i, $(i))
+	}'	> "$tmp-f1.fifo"	&
+
+    diff "$tmp-f0.fifo" "$tmp-f1.fifo"	|
+	grep '^>'			|
+	sed -e 's/^> //'		|
+	tr -d '\n'
 }
 
-printf "\033[0;0H\033[2J"
 initpattern "$pattern" "$X" "$Y" 0 0	|
     tee "$tmp-current"			|
-    tr '_' ' '
-printf "\033[${Y};${X}H"
+    tr '_' ' '				|
+    awk '{	printf("\033[%d;1H%s", NR, $0)	}'
 
 yes			|
     if [ "$n" ] ; then
@@ -48,17 +59,19 @@ yes			|
 	cat
     fi			|
 while read ; do
+    printf "\033[1;1H\n"
     "$golscript" "$tmp-current" "$X" "$Y"	|
 	tee "$tmp-mid"				|
 	refresh "$tmp-current"			|
 	tee "$tmp-out"
-    printf "\033[${Y};${X}H"
 
     mv "$tmp-mid" "$tmp-current"
 
-    if [ ! -s "$tmp-out" ] ; then break ; fi
+    if [ ! -s "$tmp-out" ] ; then
+	break
+    fi
 done
 
-echo
+printf "\033[1;1H"
 
 exit 0
