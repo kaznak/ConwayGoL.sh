@@ -58,7 +58,6 @@ while read ; do
     mv "$tmp-next.x" "$tmp-current.x"
 done
 
-printf "\033[1;1H\n"
 printf "\033[${Y};${X}H\n"
 
 exit 0
