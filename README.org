@@ -42,6 +42,23 @@ This will stop with no change between each step.
 playgol bin/conwaygol example-pattern/glider
 #+END_SRC
 
+You can record the cell changes...
+
+#+BEGIN_SRC 
+playgol bin/conwaygol example-pattern/glider	|
+tee rec
+#+END_SRC
+
+and also can replay it.
+
+#+BEGIN_SRC 
+cat rec			|
+while read l ; do
+	echo "$l"
+	sleep 1
+done
+#+END_SRC
+
 * File tree
 
 + ConwayGoL
