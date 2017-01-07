@@ -17,39 +17,19 @@ Y=${3:-"10"}
 
 ######################################################################
 
-mkfifo "$tmp-base"
-
-tr '\0' '0'	< /dev/zero	|
+tr '\0' '_'	< /dev/zero	|
     fold -w $((X + 2))		|
-    head -n $((Y + 2))	> "$tmp-base"	&
+    head -n 1	> "$tmp-line"
 
-# shape X x Y size
-## == narrow $X $Y 0 0
-awk -v FS='' -v X="$X" -v Y="$Y"	'
-	NR > Y	{
-		print "'"$pname.$stime.$$ INFO cell row overflow, choped."'"	> "/dev/stderr";
-		exit 0;
-	}
-	(length() > X)	{
-		print "'"$pname.$stime.$$ INFO cell colmun overflow, choped."'"	> "/dev/stderr";
-	}
-	{	print substr($0,1,'"$X"')	}'	"$pattern"	|
-    # == ido 1 1
-    awk -v FS='' -v X="$X" -v Y="$Y"	'
-	BEGIN{	print	}
-	{	print " " $0 }'						|
+# append outer cells
+awk '
+	BEGIN{	print "'$(cat "$tmp-line")'"	}
+	{	print "_" $0 "_"	}
+	END{	print "'$(cat "$tmp-line")'"	}
+' "$pattern"		|
     # translate
-    tr '0 _' 0		|
-    tr -c '0 _\n' 1	|
-    # == overlay "$tmp-base" -
-    paste -d'\0' "$tmp-base" -						|
-    awk -v FS='' -v X="$X" -v Y="$Y"	'
-	BEGIN{	o = X + 2; }
-	((l = length()) == X)	{
-		print ; next ;	}
-	{	print substr($0,o+1,l-o) substr($0,l-o+1,2 * o-l)
-		next ;	}'						|
-    #
+    tr '_' 0		|
+    tr -c '0\n' 1	|
     # {{ foldcell
     # == overwrap 3
     awk -v W=3	'

@@ -8,22 +8,30 @@ Conway's Game of Life implementation on shell script.
 
 * Usage
 
-Initialize.
+Initialize environment.
 
 #+BEGIN_SRC 
 . rc
 #+END_SRC
 
+Initial pattern.
+
+#+BEGIN_SRC 
+initpattern example-pattern/glider
+#+END_SRC
+
 One step execution.
 
 #+BEGIN_SRC 
-conwaygol example-pattern/glider 
+initpattern example-pattern/glider	|
+conwaygol
 #+END_SRC
 
 2 step execution.
 
 #+BEGIN_SRC 
-conwaygol example-pattern/glider	|
+initpattern example-pattern/glider	|
+conwaygol				| 
 conwaygol
 #+END_SRC
 
