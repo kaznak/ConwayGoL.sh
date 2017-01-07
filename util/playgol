@@ -19,7 +19,7 @@ Y=${6:-"$(tput lines)"}
 
 ######################################################################
 
-printf "\033[1;1H\n\033[2J\n"
+printf "\033[1;1H\033[2J\n"
 initpattern "$pattern" "$X" "$Y" 0 0	|
     tee "$tmp-current"			|
     awk -v FS=""	'
