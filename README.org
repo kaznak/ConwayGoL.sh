@@ -8,6 +8,9 @@ Conway's Game of Life implementation on shell script.
 
 * Usage
 
+Those scripts in below of this section are tested on
+MacOS 10.9 and CentOS 7.2.
+
 Initialize environment.
 
 #+BEGIN_SRC 
