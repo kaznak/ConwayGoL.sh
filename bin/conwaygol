@@ -64,27 +64,23 @@ awk '
 
 		if($5 == 0)	{	# dead cell
 			# RULE1 : reproduction
-			if(n == 3)				{	print "X";	}
-			else					{	print "_";	}
+			if(n == 3)				{	printf("X");	}
+			else					{	printf("_");	}
 		} else {	# living cell
 			# RULE2 : sustain
-			if(n == (2 + 1) || n == (3 + 1))	{	print "X";	}
+			if(n == (2 + 1) || n == (3 + 1))	{	printf("X");	}
 			# RULE3 : underpopulation
-			else if (n <= (1 + 1))			{	print "_";	}
+			else if (n <= (1 + 1))			{	printf("_");	}
 			# RULE4 : overpopulation
-			else if (n >= (4 + 1))			{	print "_";	}
+			else if (n >= (4 + 1))			{	printf("_");	}
 			# unreachable
 			else	{
 				print "'"$pname.$stime.$$ ERROR unreachable code section."'"	> "/dev/stderr";
 				exit 1;
 			}
 		}
-	}'		|
-    tr -d '\n'		|
-    {
-	cat
-	echo
-    }			|
+	}
+	END{	printf("\n");	}'	|
     fold -w "$X"
 
 ######################################################################
