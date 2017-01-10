@@ -29,13 +29,13 @@ initpattern "$pattern" "$X" "$Y" 0 0	|
 
 awk '{	printf("\033[%d;1H%s", NR, $0)	}' "$tmp-current"
 
-yes			|
+yes ""			|
     if [ "$step" ] ; then
 	head -n "$step"
     else
 	cat
     fi			|
-while read ; do
+while read x ; do
     printf "\033[1;1H\n"
     sleep "$sleep"
 
