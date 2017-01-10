@@ -38,8 +38,9 @@ conwaygol				|
 conwaygol
 #+END_SRC
 
-Play infinite step on your entire terminal.
+Play infinite steps on your entire terminal.
 This will stop with no change between each step.
+Press Ctrl-C to abort execution.
 
 #+BEGIN_SRC 
 playgol bin/conwaygol example-pattern/glider
