@@ -1,6 +1,6 @@
 * COMMENT -*- Mode: org; -*-
 
-#+TITLE: ConwayGOL
+#+TITLE: ConwayGOL.sh
 
 * About
 
@@ -80,26 +80,9 @@ done
     - playgol       : Play game of life script
 
   + example-pattern : Example patterns directory
-    - block         : Still lifes - Block pattern
-    - beehive       : Still lifes - Beehive pattern
-    - loaf          : Still lifes - Loaf pattern
-    - boat          : Still lifes - Boat pattern
-    - tub           : Still lifes - Tub pattern
+    - README.org    : README file of the directory
 
-    - blinker       : Oscillators - Blinker pattern
-    - toad          : Oscillators - Toad pattern
-    - beacon        : Oscillators - Beacon pattern
-    - pulsar        : Oscillators - Pulsar pattern
-    - pentadecathlon : Oscillators - Pentadecathlon pattern
-
-    - glider        : Spaceships - Glider pattern
-    - lightweith-spaceship : Spaceships - Lightweith spaceship pattern
-
-    - r-pentomino   : Methuselahs - The R-pentomino pattern
-    - diehard       : Methuselahs - Diehard pattern
-    - acorn         : Methuselahs - Acorn pattern
-
-    - gosper-glider-gun : Guns - Gosper glider gun pattern
+    - ... some pattern files ...
 
 * References
 
