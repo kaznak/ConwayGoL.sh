@@ -1,0 +1,6 @@
+cat example-pattern/gosper-glider-gun	|
+initpattern - $(tput cols) $(($(tput lines) - 3)) 15 5 |
+playgol-demo bin/conwaygol - |
+sed -e 's/X/'$(printf "\033[41mO\033[49m")'/g'
+exit 0
+

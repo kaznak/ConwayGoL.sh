@@ -1,0 +1,76 @@
+#!/bin/sh
+
+LANG=C
+
+pname="$(basename "$0")"
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
+
+trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+cat	<<EOF	> $tmp-message
+
+$(printf "\033[31m")シェルスクリプト$(printf "\033[39m")だけで作ったライフゲームです。
+ダウンロードはこちら https://github.com/kaznak/ConwayGoL.sh
+EOF
+
+
+message_lines="$(awk 'END{ print NR }' "$tmp-message")"
+
+golscript=${1}
+pattern=${2:-"-"}
+step=${3}
+sleep=${4:-"0"}
+X=${5:-"$(tput cols)"}
+Y=${6:-"$(($(tput lines) - $message_lines))"}
+
+######################################################################
+
+printf "\033[1;1H\033[2J\n\033[1;1H"
+cat $tmp-message
+
+initpattern "$pattern" "$X" "$Y" 0 0	|
+    tee "$tmp-current"			|
+    awk -v FS=""  -v message_lines="$message_lines"	'
+	{	for(i=1;i<=NF;i++)
+			printf("\033[%s;%sH%s\n", NR + message_lines, i, $(i))
+	}'	> "$tmp-current.x"
+
+awk -v message_lines="$message_lines" '
+	{	printf("\033[%d;1H%s", NR + message_lines,  $0)	}' "$tmp-current"
+
+yes ""			|
+    if [ "$step" ] ; then
+	head -n "$step"
+    else
+	cat
+    fi			|
+while read x ; do
+    printf "\033[$((1 + $message_lines));1H\n"
+    sleep "$sleep"
+
+    "$golscript" "$tmp-current" "$X" "$Y"	|
+	tee "$tmp-next"				|
+	awk -v FS="" -v message_lines="$message_lines"	'
+	{	for(i=1;i<=NF;i++)
+			printf("\033[%s;%sH%s\n", NR + message_lines, i, $(i))
+	}'					|
+	tee "$tmp-next.x"			|
+	diff "$tmp-current.x" -			|
+	grep '^>'				|
+	sed -e 's/^> //'			|
+	tr -d '\n'				|
+	tee "$tmp-out"
+
+    [ -s "$tmp-out" ]	||	break
+
+    mv "$tmp-next" "$tmp-current"
+
+    mv "$tmp-next.x" "$tmp-current.x"
+done
+
+printf "\033[$((Y + $message_lines));${X}H\n"
+
+exit 0
