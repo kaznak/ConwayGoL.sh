@@ -42,8 +42,8 @@ awk '
 		print o
 	}'								|
     # bind 9 cells into 1 cell
-    tr -d ' '								|
-    awk -v FS="" -v X="$X" -v Y="$Y"	'
+    sed -e 's/./& /g'	|
+    awk -v X="$X" -v Y="$Y"	'
 	BEGIN{	o = X + 2; }
 	{	for(i=1;i<=X;i++)	{
 			l = ""					# clear
@@ -58,7 +58,8 @@ awk '
     # # the output is one cell per one line
     #
     # apply rules
-    awk -v FS="" -v X="$X" -v Y="$Y"	'
+    sed -e 's/./& /g'	|
+    awk -v X="$X" -v Y="$Y"	'
 	{	n = 0;
 		for(i=1;i<=9;i++)	{	n += $(i)	}
 
