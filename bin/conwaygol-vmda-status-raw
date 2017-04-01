@@ -1,0 +1,63 @@
+#!/bin/sh
+
+LANG=C
+
+pname="$(basename "$0")"
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
+
+trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+pattern=${1:-"-"}
+
+step=${2}
+
+X=${3:-"$(tput cols)"}
+Y=${4:-"$(tput lines)"}
+
+dX=${5:-"0"}
+dY=${6:-"0"}
+
+######################################################################
+
+# conwaygol-vmda-status-raw example-pattern/glider ""| play-screen 0
+
+######################################################################
+
+# Initialize
+conwaygol-vmda-encode "$pattern" "$X" "$Y" "$dX" "$dY"	|
+    tee "$tmp-cell_vmda.STATUS"	|
+    conwaygol-vmda-decode	|
+    tee "$tmp-screen.STATUS"	|
+    {
+	cat
+	echo
+    }
+
+yes ""			|
+    if [ "$step" ] ; then
+	head -n "$step"
+    else
+	cat
+    fi			|
+while read ; do
+    conwaygol-vmda-core "$tmp-cell_vmda.STATUS"	|
+	tee "$tmp-cell_vmda.STATUS.next"	|
+	conwaygol-vmda-decode			|
+	tee "$tmp-screen.STATUS.next"		|
+	{
+	    cat
+	    echo
+	}
+
+    cmp "$tmp-screen.STATUS.next" "$tmp-screen.STATUS"	> /dev/null	&&
+	break
+
+    mv "$tmp-cell_vmda.STATUS.next" "$tmp-cell_vmda.STATUS"
+    mv "$tmp-screen.STATUS.next" "$tmp-screen.STATUS"
+done
+
+######################################################################
+exit 0

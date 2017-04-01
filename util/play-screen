@@ -1,0 +1,53 @@
+#!/bin/sh
+
+LANG=C
+
+pname="$(basename "$0")"
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
+
+trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+interval=${1:-"0.1"}
+screendat=${2:-"-"}
+newpage=${3:-""}
+
+######################################################################
+
+touch "$tmp-current-screen.STATUS"
+
+cat	<<EOF	> "$tmp-refresh-screen.sh"
+#!$(which sh)
+
+[ -s "$tmp-current-screen.STATUS.next" ]	|| exit 0
+
+diff "$tmp-current-screen.STATUS" "$tmp-current-screen.STATUS.next"	|
+grep '^>'				|
+sed -e 's/^> //'			|
+{
+    tr -d '\n'
+    printf "\033[1;1H\n"
+}
+
+mv "$tmp-current-screen.STATUS.next" "$tmp-current-screen.STATUS"
+
+sleep "$interval"
+EOF
+
+awk -v newpage="$newpage" -v line=1	\
+    -v tmpfile="$tmp-current-screen.STATUS.next"	\
+    -v nextscript="sh \"$tmp-refresh-screen.sh\""	'
+	$0 == newpage	{
+		fflush(tmpfile)
+		system(nextscript)
+		close(tmpfile)
+		line = 1; next	}
+	$0 != newpage	{
+		printf("\033[%d;1H\033[K%s\n", line, $0)	> tmpfile	}
+	$0 != newpage	{	line++;	next	}
+	END{	printf("\033[1;1H\033[2J\n")	}'  "$screendat"
+
+######################################################################
+exit 0
