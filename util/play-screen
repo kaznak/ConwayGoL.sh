@@ -36,7 +36,7 @@ mv "$tmp-current-screen.STATUS.next" "$tmp-current-screen.STATUS"
 sleep "$interval"
 EOF
 
-awk -v newpage="$newpage" -v line=1	\
+awk -v newpage="$newpage" -v line=1			\
     -v tmpfile="$tmp-current-screen.STATUS.next"	\
     -v nextscript="sh \"$tmp-refresh-screen.sh\""	'
 	$0 == newpage	{
