@@ -1,0 +1,40 @@
+#!/bin/sh
+
+LANG=C
+
+pname="$(basename "$0")"
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
+
+trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+vmda="${1:-"-"}"
+
+pad="$2"
+
+[ "$#" -lt 2 ]	&& pad=" "
+
+######################################################################
+
+# 1:rank 2:maxX 3:maxY 4:X 5:Y 6:value
+awk -v pad="$pad" -v ccol=1 -v cline=1	'
+	{	X = $2; Y = $3;
+		for(; $5 > cline; cline++)	{
+			for(; X >= ccol; ccol++)	printf("%s", pad);
+			printf("\n");  
+			ccol = 1;
+		}
+		for(; $4 > ccol; ccol++)		printf("%s", pad);
+
+		printf("%s", $6); ccol++;	}
+	END{	for(; Y >= cline; cline++)	{
+			for(; X >= ccol; ccol++)	printf("%s", pad);
+			printf("\n");
+			ccol = 1;
+		}
+	}' "$vmda"
+
+######################################################################
+exit 0

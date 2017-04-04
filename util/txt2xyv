@@ -1,0 +1,38 @@
+#!/bin/sh
+
+LANG=C
+
+pname="$(basename "$0")"
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
+
+trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+txt="${1:-"-"}"
+
+pad="$2"
+
+[ "$#" -lt 2 ]	&& pad=" "
+
+######################################################################
+
+cat "$txt"		|
+# trancelator
+    if [ -z "$pad" ] ; then
+	awk -v pad="$pad"	'
+	{	len = length()
+		for(i = 1; i<= len; i++)
+			printf("%d %d %s\n", i, NR, substr($0, i, 1))
+	}'
+    else
+	awk -v pad="$pad"	'
+	{	len = length()
+		for(i = 1; i<= len; i++)	if(substr($0, i, 1) != pad)
+			printf("%d %d %s\n", i, NR, substr($0, i, 1))
+	}'
+    fi
+
+######################################################################
+exit 0
