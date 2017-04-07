@@ -1,0 +1,64 @@
+#!/bin/sh
+
+LANG=C
+
+pname="$(basename "$0")"
+stime="$(date +%Y%m%d%H%M%S)"
+tmp="/tmp/$pname.$stime.$$"
+
+trap 'rm -f $tmp-*' EXIT
+
+######################################################################
+
+xyv="${1:-"-"}"
+
+pad="${2:-" "}"
+
+X="$3"
+Y="$4"
+
+######################################################################
+
+# 1:X 2:Y 3:value
+if [ "$pad" ] ; then
+    awk -v pad="$pad" -v X="$X" -v Y="$Y" -v ccol=1 -v cline=1	'
+	{	for(; $2 > cline; cline++)	{
+			for(; X >= ccol; ccol++)	printf("%s", pad);
+			printf("\n");  
+			ccol = 1;		}
+		for(; $1 > ccol; ccol++)		printf("%s", pad);
+		printf("%s", $3); ccol++;	}
+	END{	for(; Y >= cline; cline++)	{
+			for(; X >= ccol; ccol++)	printf("%s", pad);
+			printf("\n");
+			ccol = 1;	}	}'	"$xyv"
+else
+    awk -v pad=" " -v X="$X" -v Y="$Y" -v ccol=1 -v cline=1	'
+	{	for(; $2 > cline; cline++)	{
+			printf("\n");  
+			ccol = 1;		}
+		for(; $1 > ccol; ccol++)		printf("%s", pad);
+		printf("%s", $3); ccol++;	}'	"$xyv"
+fi
+    
+######################################################################
+exit 0
+
+awk -v pad="$pad" -v X="$X" -v Y="$Y" -v ccol=1 -v cline=1	'
+	{	for(; $2 > cline; cline++)	{
+			for(; X >= ccol; ccol++)	printf("%s", pad);
+			printf("\n");  
+			ccol = 1;
+		}
+		for(; $4 > ccol; ccol++)		printf("%s", pad);
+
+		printf("%s", $6); ccol++;	}
+	END{	for(; Y >= cline; cline++)	{
+			for(; X >= ccol; ccol++)	printf("%s", pad);
+			printf("\n");
+			ccol = 1;
+		}
+	}' "$vmda"
+
+######################################################################
+exit 0
