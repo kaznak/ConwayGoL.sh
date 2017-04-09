@@ -37,8 +37,12 @@ cat "$pattern"			|
     tee "$tmp-screen.STATUS"	|
     {
 	cat
-	echo
+	[ "$step" -eq 0 ]	||
+	    echo
     }
+
+[ "$step" -eq 0 ]	&&
+    exit 0
 
 yes ""			|
     if [ "$step" ] ; then
