@@ -20,7 +20,8 @@ Initialize environment.
 Initial pattern.
 
 #+BEGIN_SRC 
-ido 3 3 example-pattern/glider
+ido 3 3 example-pattern/glider	|
+conwaygol - 0 10 10
 #+END_SRC
 
 One step execution.
