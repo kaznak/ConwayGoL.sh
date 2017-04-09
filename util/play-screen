@@ -6,11 +6,11 @@ pname="$(basename "$0")"
 stime="$(date +%Y%m%d%H%M%S)"
 tmp="/tmp/$pname.$stime.$$"
 
-trap 'rm -f $tmp-*' EXIT
+trap 'rm -f $tmp-*; printf "\033[1;1H\033[2J"' EXIT
 
 ######################################################################
 
-interval=${1:-"0.1"}
+interval=${1:-"0"}
 screendat=${2:-"-"}
 newpage=${3:-""}
 
