@@ -43,22 +43,3 @@ fi
     
 ######################################################################
 exit 0
-
-awk -v pad="$pad" -v X="$X" -v Y="$Y" -v ccol=1 -v cline=1	'
-	{	for(; $2 > cline; cline++)	{
-			for(; X >= ccol; ccol++)	printf("%s", pad);
-			printf("\n");  
-			ccol = 1;
-		}
-		for(; $4 > ccol; ccol++)		printf("%s", pad);
-
-		printf("%s", $6); ccol++;	}
-	END{	for(; Y >= cline; cline++)	{
-			for(; X >= ccol; ccol++)	printf("%s", pad);
-			printf("\n");
-			ccol = 1;
-		}
-	}' "$vmda"
-
-######################################################################
-exit 0
