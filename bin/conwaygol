@@ -103,13 +103,13 @@ while read ; do
 		exit 1;	}'		|
 	awk	'$3 > 0'		|
 	#
-	tee "$tmp-cell_xyv.STATUS.next"		|
-	xyv2txt - "0" "$X" "$Y"			|
+	tee "$tmp-cell_xyv.STATUS.next"	|
+	xyv2txt - "0" "$X" "$Y"		|
 	#
-	tr '012345678' '_'			|
-	tr '9' 'X'				|
+	tr '012345678' '_'		|
+	tr '9' 'X'			|
 	#
-	tee "$tmp-screen.STATUS.next"		|
+	tee "$tmp-screen.STATUS.next"	|
 	{
 	    cat
 	    echo
