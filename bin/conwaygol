@@ -12,7 +12,7 @@ trap 'rm -f $tmp-*' EXIT
 
 pattern=${1:-"-"}
 
-step=${2}
+step="${2:-"-1"}"
 
 X=${3:-"$(tput cols)"}
 Y=${4:-"$(tput lines)"}
@@ -45,7 +45,7 @@ cat "$pattern"			|
     exit 0
 
 yes ""			|
-    if [ "$step" ] ; then
+    if [ 0 -lt "$step" ] ; then
 	head -n "$step"
     else
 	cat
