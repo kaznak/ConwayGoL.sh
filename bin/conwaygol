@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -Cu
+
 LANG=C
 
 pname="$(basename "$0")"
@@ -19,7 +21,12 @@ Y=${4:-"$(tput lines)"}
 
 ######################################################################
 
-# ido 10 10 example-pattern/gosper-glider-gun | conwaygol-xyv | play-screen 0
+CONV()	{
+    tr '012345678' '_'		|
+	tr '9' 'X'
+}
+
+newpage=""
 
 ######################################################################
 
@@ -31,18 +38,12 @@ cat "$pattern"			|
     tee "$tmp-cell_xyv.STATUS"	|
     xyv2txt - "0" "$X" "$Y"	|
     #
-    tr '012345678' '_'		|
-    tr '9' 'X'			|
-    #
-    tee "$tmp-screen.STATUS"	|
-    {
-	cat
-	[ "$step" -eq 0 ]	||
-	    echo
-    }
+    CONV
 
 [ "$step" -eq 0 ]	&&
     exit 0
+
+echo "$newpage"
 
 yes ""			|
     if [ 0 -lt "$step" ] ; then
@@ -106,20 +107,14 @@ while read ; do
 	tee "$tmp-cell_xyv.STATUS.next"	|
 	xyv2txt - "0" "$X" "$Y"		|
 	#
-	tr '012345678' '_'		|
-	tr '9' 'X'			|
-	#
-	tee "$tmp-screen.STATUS.next"	|
-	{
-	    cat
-	    echo
-	}
+	CONV
 
-    cmp "$tmp-screen.STATUS.next" "$tmp-screen.STATUS"	> /dev/null	&&
+    cmp "$tmp-cell_xyv.STATUS.next" "$tmp-cell_xyv.STATUS"	> /dev/null	&&
 	break
+    
+    echo "$newpage"
 
     mv "$tmp-cell_xyv.STATUS.next" "$tmp-cell_xyv.STATUS"
-    mv "$tmp-screen.STATUS.next" "$tmp-screen.STATUS"
 done
 
 ######################################################################
