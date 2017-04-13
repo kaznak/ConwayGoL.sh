@@ -68,18 +68,7 @@ while read ; do
 	(X >= $1 && $1 > 0) && (Y >= $2 && $2 > 0)
 	'				|
 	sort -k2n -k1n			|
-	#=> sm2 key=1/2 val=3/4		|
-	awk	-v sum3=0 -v sum4=0 '
-	key != $1 " " $2	{
-		print key, sum3, sum4
-
-		key = $1 " " $2; sum3 = $3; sum4 = $4;
-		next	}
-	{	sum3 = sum3 + $3; sum4 = sum4 + $4;	}
-	END	{
-		print $1, $2, sum3, sum4
-	}'				|
-	sed '1d'			|
+	sm2 1 2 3 4			|
 	#
 	## calculate next state for each cell
 	awk '
