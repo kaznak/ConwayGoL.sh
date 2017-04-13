@@ -83,23 +83,15 @@ while read ; do
 	#
 	## calculate next state for each cell
 	awk '
-	($4 != "9" && $3 == "3")	{
-		# RULE1 : reproduction
-		print $1, $2, 9;	next;	}
-	($4 != "9" && $3 != "3")	{
-		print $1, $2, $4 - 1;	next;	}
-
+	($4 != "9" && $3 == "3")	||
 	($4 == "9" && ($3 == "3" || $3 == "4"))	{
+		# RULE1 : reproduction
 		# RULE2 : sustain
 		print $1, $2, 9;	next;	}
-	($4 == "9" && $3 <= "2")	{
-		# RULE3 : underpopulation
-		print $1, $2, $4 - 1;	next;	}
-	($4 == "9" && $3 >= "5")	{
-		# RULE3 : underpopulation
-		print $1, $2, $4 - 1;	next;	}
-	{	print "'"$pname.$stime.$$ ERROR unreachable code section."'"	> "/dev/stderr";
-		exit 1;	}'		|
+	{	# RULE3 : under-population
+		# RULE4 : over-population
+		# RULE5 : null
+		print $1, $2, $4 - 1;	next;	}'	|
 	awk	'$3 > 0'		|
 	#
 	tee "$tmp-cell_xyv.STATUS.next"	|
