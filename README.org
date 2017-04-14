@@ -90,8 +90,8 @@ done
 
     - ... some pattern files ...
 
-* Note
-util directory contains the part of Open usp Tukubai.
+* License Note
+Some file of util directory is the parts of Open usp Tukubai.
 
 https://github.com/usp-engineers-community/Open-usp-Tukubai
 
